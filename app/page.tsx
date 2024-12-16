@@ -7,23 +7,41 @@ import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { X } from 'lucide-react';
 
-const TradingPost = () => {
-  const [finalItem, setFinalItem] = useState({
+interface Material {
+  id: number;
+  name: string;
+  price: string;
+  quantity: string;
+}
+
+interface FinalItem {
+  name: string;
+  price: string;
+}
+
+interface ProfitState {
+  totalCost: number;
+  profit: number;
+  isProfit: boolean;
+}
+
+const TradingPost: React.FC = () => {
+  const [finalItem, setFinalItem] = useState<FinalItem>({
     name: '',
     price: ''
   });
   
-  const [materials, setMaterials] = useState([
+  const [materials, setMaterials] = useState<Material[]>([
     { id: 1, name: '', price: '', quantity: '' }
   ]);
   
-  const [profit, setProfit] = useState({
+  const [profit, setProfit] = useState<ProfitState>({
     totalCost: 0,
     profit: 0,
     isProfit: false
   });
 
-  const addMaterial = () => {
+  const addMaterial = (): void => {
     setMaterials([
       ...materials,
       {
@@ -35,11 +53,11 @@ const TradingPost = () => {
     ]);
   };
 
-  const removeMaterial = (id) => {
+  const removeMaterial = (id: number): void => {
     setMaterials(materials.filter(material => material.id !== id));
   };
 
-  const updateMaterial = (id, field, value) => {
+  const updateMaterial = (id: number, field: keyof Material, value: string): void => {
     setMaterials(materials.map(material => {
       if (material.id === id) {
         // For price and quantity, only allow numbers and decimal point
@@ -56,7 +74,7 @@ const TradingPost = () => {
     }));
   };
 
-  const calculateProfit = () => {
+  const calculateProfit = (): void => {
     const totalCost = materials.reduce((sum, material) => {
       const price = parseFloat(material.price) || 0;
       const quantity = parseFloat(material.quantity) || 0;
@@ -99,10 +117,9 @@ const TradingPost = () => {
                 type="text"
                 placeholder="0.00"
                 value={finalItem.price}
-                step="0.1"
                 onChange={(e) => setFinalItem({ 
                   ...finalItem, 
-                  price: Math.round(parseFloat(e.target.value || 0) * 100) / 100 
+                  price: e.target.value.replace(/[^0-9.]/g, '') 
                 })}
               />
             </div>
@@ -127,8 +144,8 @@ const TradingPost = () => {
                 <Label htmlFor={`material-${material.id}-price`}>Unit Price</Label>
                 <Input
                   id={`material-${material.id}-price`}
-                  type="number"
-                  placeholder="0"
+                  type="text"
+                  placeholder="0.00"
                   value={material.price}
                   onChange={(e) => updateMaterial(material.id, 'price', e.target.value)}
                 />
@@ -137,8 +154,8 @@ const TradingPost = () => {
                 <Label htmlFor={`material-${material.id}-quantity`}>Quantity</Label>
                 <Input
                   id={`material-${material.id}-quantity`}
-                  type="number"
-                  placeholder="0"
+                  type="text"
+                  placeholder="0.00"
                   value={material.quantity}
                   onChange={(e) => updateMaterial(material.id, 'quantity', e.target.value)}
                 />
